@@ -1,14 +1,13 @@
 #include <pebble.h>
 #include "window.h"
   
-static Window *s_main_window;
-static TextLayer *s_time_layer;
-static TextLayer *s_weather_layer;
-static TextLayer *s_weather_city_layer;
-static TextLayer *s_symbol_layer;
-static TextLayer *s_symbol_price_layer;
-
-static GFont s_time_font;
+//static Window *s_main_window;
+//static TextLayer *s_time_layer;
+//static TextLayer *s_weather_layer;
+//static TextLayer *s_weather_city_layer;
+//static TextLayer *s_symbol_layer;
+//static TextLayer *s_symbol_price_layer;
+//static GFont s_time_font;
 
 enum {
   KEY_TEMPERATURE = 0,
@@ -67,59 +66,59 @@ static void fetch_quote()
   app_message_outbox_send();
 }
 
-static void main_window_load(Window *window) {
-
-  //Create GFont
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_LCD_40));
-
-  // Create time TextLayer
-  s_time_layer = text_layer_create(GRect(4, 0, 140, 50));
-  text_layer_set_background_color(s_time_layer, GColorClear);
-  text_layer_set_text_color(s_time_layer, GColorBlack);
-  text_layer_set_font(s_time_layer, s_time_font);
-
-  // Create symbol TextLayer
-  s_symbol_layer = text_layer_create(GRect(4, 45, 140, 50));
-  text_layer_set_background_color(s_symbol_layer, GColorClear);
-  text_layer_set_text_color(s_symbol_layer, GColorBlack);
-  text_layer_set_font(s_symbol_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-
-  // Create Weather Layer
-  s_weather_layer = text_layer_create(GRect(0, 127, 140, 35));
-  text_layer_set_background_color(s_weather_layer, GColorClear);
-  text_layer_set_text_color(s_weather_layer, GColorBlack);
-  text_layer_set_text_alignment(s_weather_layer, GTextAlignmentRight);
-  text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-  text_layer_set_text(s_weather_layer, "guessing...");
-
-  // Create Weather City Layer
-  s_weather_city_layer = text_layer_create(GRect(0, 147, 140, 35));
-  text_layer_set_background_color(  s_weather_city_layer, GColorClear);
-  text_layer_set_text_color(  s_weather_city_layer, GColorBlack);
-  text_layer_set_text_alignment(  s_weather_city_layer, GTextAlignmentRight);
-  text_layer_set_font(s_weather_city_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
-
-  // Add to child layer
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_symbol_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_city_layer));
-
-  update_time();
-  fetch_weather();
-  fetch_quote();
-}
-
-static void main_window_unload(Window *window) {
-  //Unload GFont
-  fonts_unload_custom_font(s_time_font);
-
-  // Destroy TextLayer
-  text_layer_destroy(s_time_layer);
-  text_layer_destroy(s_symbol_layer);
-  text_layer_destroy(s_weather_layer);
-  text_layer_destroy(s_weather_city_layer);
-}
+//static void main_window_load(Window *window) {
+//
+//  //Create GFont
+//  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_LCD_40));
+//
+//  // Create time TextLayer
+//  s_time_layer = text_layer_create(GRect(4, 0, 140, 50));
+//  text_layer_set_background_color(s_time_layer, GColorClear);
+//  text_layer_set_text_color(s_time_layer, GColorBlack);
+//  text_layer_set_font(s_time_layer, s_time_font);
+//
+//  // Create symbol TextLayer
+//  s_symbol_layer = text_layer_create(GRect(4, 45, 140, 50));
+//  text_layer_set_background_color(s_symbol_layer, GColorClear);
+//  text_layer_set_text_color(s_symbol_layer, GColorBlack);
+//  text_layer_set_font(s_symbol_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+//
+//  // Create Weather Layer
+//  s_weather_layer = text_layer_create(GRect(0, 127, 140, 35));
+//  text_layer_set_background_color(s_weather_layer, GColorClear);
+//  text_layer_set_text_color(s_weather_layer, GColorBlack);
+//  text_layer_set_text_alignment(s_weather_layer, GTextAlignmentRight);
+//  text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+//  text_layer_set_text(s_weather_layer, "guessing...");
+//
+//  // Create Weather City Layer
+//  s_weather_city_layer = text_layer_create(GRect(0, 147, 140, 35));
+//  text_layer_set_background_color(  s_weather_city_layer, GColorClear);
+//  text_layer_set_text_color(  s_weather_city_layer, GColorBlack);
+//  text_layer_set_text_alignment(  s_weather_city_layer, GTextAlignmentRight);
+//  text_layer_set_font(s_weather_city_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
+//
+//  // Add to child layer
+//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
+//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_symbol_layer));
+//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
+//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_city_layer));
+//
+//  update_time();
+//  fetch_weather();
+//  fetch_quote();
+//}
+//
+//static void main_window_unload(Window *window) {
+//  //Unload GFont
+//  fonts_unload_custom_font(s_time_font);
+//
+//  // Destroy TextLayer
+//  text_layer_destroy(s_time_layer);
+//  text_layer_destroy(s_symbol_layer);
+//  text_layer_destroy(s_weather_layer);
+//  text_layer_destroy(s_weather_city_layer);
+//}
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 {
@@ -231,22 +230,26 @@ static void init() {
   // Open AppMessage
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
 
-  // Create main Window element and assign to pointer
-  s_main_window = window_create();
+  show_window();
 
-  // Set handlers to manage the elements inside the Window
-  window_set_window_handlers(s_main_window, (WindowHandlers) {
-    .load = main_window_load,
-    .unload = main_window_unload
-  });
+  //// Create main Window element and assign to pointer
+  //s_main_window = window_create();
 
-  // Show the Window on the watch, with animated=true
-  window_stack_push(s_main_window, true);  
+  //// Set handlers to manage the elements inside the Window
+  //window_set_window_handlers(s_main_window, (WindowHandlers) {
+  //  .load = main_window_load,
+  //  .unload = main_window_unload
+  //});
+
+  //// Show the Window on the watch, with animated=true
+  //window_stack_push(s_main_window, true);  
 }
 
 static void deinit() {
   // Destroy Window
-  window_destroy(s_main_window);
+//  window_destroy(s_main_window);
+    hide_window();
+
 }
 
 int main(void) {
@@ -254,4 +257,3 @@ int main(void) {
   app_event_loop();
   deinit();
 }
-
