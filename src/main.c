@@ -1,21 +1,25 @@
 #include <pebble.h>
+#include "window.h"
+  
+static Window *s_main_window;
+static TextLayer *s_time_layer;
+static TextLayer *s_weather_layer;
+static TextLayer *s_weather_city_layer;
+static TextLayer *s_symbol_layer;
+static TextLayer *s_symbol_price_layer;
 
-  static Window *s_main_window;
-  static TextLayer *s_time_layer;
-  static TextLayer *s_weather_layer;
-  static TextLayer *s_weather_city_layer;
-  static TextLayer *s_symbol_layer;
-  static TextLayer *s_symbol_price_layer;
-  
-  static GFont s_time_font;
-  
+static GFont s_time_font;
+
 enum {
   KEY_TEMPERATURE = 0,
   KEY_CONDITIONS = 1,
   KEY_CITY = 2,
   // STOCKS
   KEY_SYMBOL = 3,
-  KEY_PRICE = 4
+  KEY_PRICE = 4,
+  // MSGS
+  RefreshWeather = 5,
+  GetQuote = 6
 };
 
 static void update_time() {
@@ -41,8 +45,22 @@ static void fetch_weather()
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
 
-  int value = 1; 
-  dict_write_int(iter, 1, &value, sizeof(int), true); 
+  Tuplet cmd = TupletInteger(RefreshWeather, 1);
+  dict_write_tuplet(iter, &cmd); 
+  dict_write_end(iter); 
+
+  // Send the message!
+  app_message_outbox_send();
+}
+
+static void fetch_quote()
+{
+  // Begin dictionary
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+
+  Tuplet cmd = TupletCString(GetQuote, "DIS");
+  dict_write_tuplet(iter, &cmd); 
   dict_write_end(iter); 
 
   // Send the message!
@@ -52,7 +70,7 @@ static void fetch_weather()
 static void main_window_load(Window *window) {
 
   //Create GFont
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_LCD_35));
+  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_LCD_40));
 
   // Create time TextLayer
   s_time_layer = text_layer_create(GRect(4, 0, 140, 50));
@@ -89,6 +107,7 @@ static void main_window_load(Window *window) {
 
   update_time();
   fetch_weather();
+  fetch_quote();
 }
 
 static void main_window_unload(Window *window) {
@@ -106,9 +125,13 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 {
   update_time();
 
+  // Get stock updates every 5 minutes
+  if (tick_time->tm_min % 5 == 0)
+    fetch_quote();
+
   // Get weather update every 15 minutes
-  //if(tick_time->tm_min % 15 == 0)
-  fetch_weather();  
+  if (tick_time->tm_min % 15 == 0)
+    fetch_weather();  
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {

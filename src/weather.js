@@ -78,7 +78,7 @@ function getQuotes()
 // Listen for when the watchface is opened
 Pebble.addEventListener('ready', 
                         function(e) {
-                          console.log('PebbleKit JS ready!');
+                          console.log('ready: ' + JSON.stringify(e.payload));
 
                           getWeather();
                           getQuotes();
@@ -88,11 +88,21 @@ Pebble.addEventListener('ready',
 // Listen for when an AppMessage is received
 Pebble.addEventListener('appmessage',
                         function(e) {
-                          console.log('AppMessage received!');
+                          console.log('appmessage: ' + JSON.stringify(e.payload));
 
-                          getWeather();
-                          getQuotes();
-                        }                     
+                          if (e.payload.RefreshWeather)
+                          {
+                            console.log('appmessage: fetching weather');
+                            getWeather();                              
+                          }
+
+                          if (e.payload.GetQuote)
+                          {
+                            console.log('appmessage: fetching stock ' + e.payload.GetQuote);
+                            _symbol = e.payload.GetQuote;
+                            getQuotes();
+                          }                          
+                        }
                        );
 
 ////////////////////////////////////////////////////////////////
