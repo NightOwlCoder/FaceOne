@@ -1,0 +1,35 @@
+{
+    "appKeys": {
+        "KEY_CITY": 2,
+        "KEY_CONDITIONS": 1,
+        "KEY_PRICE": 4,
+        "KEY_SYMBOL": 3,
+        "KEY_TEMPERATURE": 0
+    },
+    "capabilities": [
+        "location"
+    ],
+    "companyName": "NightOwl",
+    "longName": "FaceOne",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "fonts/DS-DIGIB.TTF",
+                "name": "FONT_LCD_35",
+                "type": "font"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "FaceOne",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
+    "uuid": "8fd16bc6-f4d4-4754-a6a9-cb76d25ff03a",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
