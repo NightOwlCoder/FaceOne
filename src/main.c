@@ -19,7 +19,7 @@ enum
 };
 
 // returns true when market is open
-static bool update_time()
+static bool update_time(char *timetoclose, int countb)
 {
   // Get a tm structure
   time_t temp = time(NULL); 
@@ -29,6 +29,8 @@ static bool update_time()
   static char buffer[] = "00:00";
 
   strftime(buffer, sizeof("00:00"), "%l:%M", tick_time);
+  if (buffer[0] == ' ')
+    memmove(&buffer[0], &buffer[1], sizeof(buffer) - 1);
 
   set_time(buffer, tick_time->tm_hour < 12);
 
@@ -53,13 +55,28 @@ static bool update_time()
 
   set_day(date_date);
 
+  bool open = false;
+  
   if (tick_time->tm_hour == 6 && tick_time->tm_min > 28)
-    return true;  
+    open = true;  
   else if (tick_time->tm_hour > 6 && tick_time->tm_hour < 13)
-    return true;
+    open = true;
   else if (tick_time->tm_hour == 23 && tick_time->tm_min <= 5)
-    return true;
+    open = true;
 
+  if (open)
+  {
+    int closeAt = 13 * 60;
+    int current = (tick_time->tm_hour * 60) + tick_time->tm_min;
+    int timeToClose = closeAt - current;
+    int h = timeToClose / 60;
+    int m = timeToClose - (h * 60);
+  
+    snprintf(timetoclose, countb, "-%d:%02d", h, m);
+    
+    return open;
+  }
+  
   return false;
 }
 
@@ -105,9 +122,13 @@ static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
 {
   static int stockCounter = 0;
   static int weatherCounter = 0;
+  static char timeToClose[30];
 
-  bool marketOpen = update_time();
-  set_marketOpen(marketOpen);
+  bool marketOpen = update_time(timeToClose, sizeof(timeToClose));
+  
+        APP_LOG(APP_LOG_LEVEL_ERROR, "setting mkt open to %d, %s", (int)marketOpen, timeToClose);
+
+  set_marketOpen(marketOpen, timeToClose);
 
   if (!marketOpen)
   {
@@ -213,7 +234,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
   if (*symbol_buffer && *price_buffer)
   {
-    snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s: %s", symbol_buffer, price_buffer);
+    snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s %s (%s)", symbol_buffer, price_buffer, change_buffer);
     APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock to [%s]", stock_layer_buffer);
     set_stock(index, stock_layer_buffer);
   }

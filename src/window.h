@@ -8,4 +8,4 @@ void set_stock(int index, char * value);
 void set_weather(char * value);
 void set_city(char * value);
 
-void set_marketOpen(bool open);
+void set_marketOpen(bool open, char * timetoclose);
