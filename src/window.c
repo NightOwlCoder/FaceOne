@@ -2,11 +2,11 @@
   #include "window.h"
 
   // BEGIN AUTO-GENERATED UI CODE; DO NOT MODIFY
-static Window *s_window;
+  static Window *s_window;
 static GFont s_res_bitham_42_medium_numbers;
 static GFont s_res_gothic_24_bold;
 static GFont s_res_gothic_18;
-static GFont s_res_gothic_18_bold;
+static GFont s_res_roboto_condensed_21;
 static TextLayer *s_textlayer_time;
 static TextLayer *s_textlayer_stock1;
 static TextLayer *s_textlayer_weekday;
@@ -16,6 +16,7 @@ static TextLayer *s_textlayer_stock2;
 static TextLayer *s_textlayer_day;
 static TextLayer *s_textlayer_stock3;
 static TextLayer *s_textlayer_market;
+static TextLayer *s_textlayer_ampm;
 
 static void initialise_ui(void) {
   s_window = window_create();
@@ -23,19 +24,19 @@ static void initialise_ui(void) {
   #ifndef PBL_SDK_3
     window_set_fullscreen(s_window, true);
   #endif
-  
-  s_res_bitham_42_medium_numbers = fonts_get_system_font(FONT_KEY_BITHAM_42_MEDIUM_NUMBERS);
+
+    s_res_bitham_42_medium_numbers = fonts_get_system_font(FONT_KEY_BITHAM_42_MEDIUM_NUMBERS);
   s_res_gothic_24_bold = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
   s_res_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
-  s_res_gothic_18_bold = fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD);
+  s_res_roboto_condensed_21 = fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21);
   // s_textlayer_time
-  s_textlayer_time = text_layer_create(GRect(0, -8, 104, 43));
+  s_textlayer_time = text_layer_create(GRect(0, -8, 94, 43));
   text_layer_set_background_color(s_textlayer_time, GColorClear);
   text_layer_set_text_color(s_textlayer_time, GColorWhite);
-  text_layer_set_text(s_textlayer_time, "55:55");
+  text_layer_set_text(s_textlayer_time, "0:00");
   text_layer_set_font(s_textlayer_time, s_res_bitham_42_medium_numbers);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_time);
-  
+
   // s_textlayer_stock1
   s_textlayer_stock1 = text_layer_create(GRect(2, 46, 142, 24));
   text_layer_set_background_color(s_textlayer_stock1, GColorClear);
@@ -44,16 +45,16 @@ static void initialise_ui(void) {
   text_layer_set_text_alignment(s_textlayer_stock1, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_stock1, s_res_gothic_24_bold);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock1);
-  
+
   // s_textlayer_weekday
-  s_textlayer_weekday = text_layer_create(GRect(104, 0, 40, 18));
+  s_textlayer_weekday = text_layer_create(GRect(100, 0, 44, 18));
   text_layer_set_background_color(s_textlayer_weekday, GColorClear);
   text_layer_set_text_color(s_textlayer_weekday, GColorWhite);
   text_layer_set_text(s_textlayer_weekday, "THU");
   text_layer_set_text_alignment(s_textlayer_weekday, GTextAlignmentRight);
   text_layer_set_font(s_textlayer_weekday, s_res_gothic_18);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_weekday);
-  
+
   // s_textlayer_weather
   s_textlayer_weather = text_layer_create(GRect(42, 123, 100, 24));
   text_layer_set_background_color(s_textlayer_weather, GColorClear);
@@ -62,7 +63,7 @@ static void initialise_ui(void) {
   text_layer_set_text_alignment(s_textlayer_weather, GTextAlignmentRight);
   text_layer_set_font(s_textlayer_weather, s_res_gothic_24_bold);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_weather);
-  
+
   // s_textlayer_city
   s_textlayer_city = text_layer_create(GRect(42, 148, 100, 20));
   text_layer_set_background_color(s_textlayer_city, GColorClear);
@@ -71,7 +72,7 @@ static void initialise_ui(void) {
   text_layer_set_text_alignment(s_textlayer_city, GTextAlignmentRight);
   text_layer_set_font(s_textlayer_city, s_res_gothic_18);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_city);
-  
+
   // s_textlayer_stock2
   s_textlayer_stock2 = text_layer_create(GRect(2, 70, 142, 24));
   text_layer_set_background_color(s_textlayer_stock2, GColorClear);
@@ -80,16 +81,16 @@ static void initialise_ui(void) {
   text_layer_set_text_alignment(s_textlayer_stock2, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_stock2, s_res_gothic_24_bold);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock2);
-  
+
   // s_textlayer_day
-  s_textlayer_day = text_layer_create(GRect(104, 18, 40, 18));
+  s_textlayer_day = text_layer_create(GRect(100, 18, 44, 21));
   text_layer_set_background_color(s_textlayer_day, GColorClear);
   text_layer_set_text_color(s_textlayer_day, GColorWhite);
-  text_layer_set_text(s_textlayer_day, "7/9");
+  text_layer_set_text(s_textlayer_day, "0/00");
   text_layer_set_text_alignment(s_textlayer_day, GTextAlignmentRight);
-  text_layer_set_font(s_textlayer_day, s_res_gothic_18_bold);
+  text_layer_set_font(s_textlayer_day, s_res_roboto_condensed_21);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_day);
-  
+
   // s_textlayer_stock3
   s_textlayer_stock3 = text_layer_create(GRect(2, 94, 142, 24));
   text_layer_set_background_color(s_textlayer_stock3, GColorClear);
@@ -98,12 +99,18 @@ static void initialise_ui(void) {
   text_layer_set_text_alignment(s_textlayer_stock3, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_stock3, s_res_gothic_24_bold);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock3);
-  
+
   // s_textlayer_market
   s_textlayer_market = text_layer_create(GRect(0, 152, 40, 16));
   text_layer_set_text(s_textlayer_market, "closed");
   text_layer_set_text_alignment(s_textlayer_market, GTextAlignmentCenter);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_market);
+
+  // s_textlayer_ampm
+  s_textlayer_ampm = text_layer_create(GRect(94, 2, 20, 16));
+  text_layer_set_text(s_textlayer_ampm, "PM");
+  text_layer_set_text_alignment(s_textlayer_ampm, GTextAlignmentCenter);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_ampm);
 }
 
 static void destroy_ui(void) {
@@ -117,6 +124,7 @@ static void destroy_ui(void) {
   text_layer_destroy(s_textlayer_day);
   text_layer_destroy(s_textlayer_stock3);
   text_layer_destroy(s_textlayer_market);
+  text_layer_destroy(s_textlayer_ampm);
 }
 // END AUTO-GENERATED UI CODE
 
@@ -149,9 +157,32 @@ void hide_window(void)
   window_stack_remove(s_window, true);
 }
 
-void set_time(char * value)
+static TextLayer* cl_init_text_layer(GRect location, GColor colour, GColor background, const char *res_id, GTextAlignment alignment)
+{
+  TextLayer *layer = text_layer_create(location);
+  text_layer_set_text_color(layer, colour);
+  text_layer_set_background_color(layer, background);
+  text_layer_set_font(layer, fonts_get_system_font(res_id));
+  text_layer_set_text_alignment(layer, alignment);
+
+  return layer;
+} 
+
+void set_time(char * value, bool am)
 {  
   text_layer_set_text(s_textlayer_time, value);
+
+  GSize size = text_layer_get_content_size(s_textlayer_time);
+
+  text_layer_destroy(s_textlayer_ampm);
+
+  s_textlayer_ampm = text_layer_create(GRect(size.w+2, 2, 20, 16));
+  if (am)
+    text_layer_set_text(s_textlayer_ampm, "AM");
+  else
+    text_layer_set_text(s_textlayer_ampm, "PM");
+  text_layer_set_text_alignment(s_textlayer_ampm, GTextAlignmentCenter);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_ampm);
 }
 
 void set_weekday(char * value)
@@ -178,13 +209,11 @@ void set_marketOpen(bool open)
 {
   if (open)
   {
-    text_layer_set_text(s_textlayer_market, "open");
     text_layer_set_background_color(s_textlayer_market, GColorClear);
-    text_layer_set_text_color(s_textlayer_market, GColorWhite);
+    text_layer_set_text_color(s_textlayer_market, GColorBlack);
   }
   else
   {
-    text_layer_set_text(s_textlayer_market, "closed");
     text_layer_set_background_color(s_textlayer_market, GColorWhite);
     text_layer_set_text_color(s_textlayer_market, GColorBlack);
   }

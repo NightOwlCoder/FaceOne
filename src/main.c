@@ -28,13 +28,9 @@ static bool update_time()
   // Create a long-lived buffer
   static char buffer[] = "00:00";
 
-  // Write the current hours and minutes into the buffer
-  if (clock_is_24h_style() == true)
-    strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
-  else
-    strftime(buffer, sizeof("00:00"), "%I:%M", tick_time);
+  strftime(buffer, sizeof("00:00"), "%l:%M", tick_time);
 
-  set_time(buffer);
+  set_time(buffer, tick_time->tm_hour < 12);
 
   static char date_weekday[] = "XXX";
 
@@ -59,7 +55,9 @@ static bool update_time()
 
   if (tick_time->tm_hour == 6 && tick_time->tm_min > 28)
     return true;  
-  else if (tick_time->tm_hour > 6 && tick_time->tm_hour < 14)
+  else if (tick_time->tm_hour > 6 && tick_time->tm_hour < 13)
+    return true;
+  else if (tick_time->tm_hour == 23 && tick_time->tm_min <= 5)
     return true;
 
   return false;
@@ -67,7 +65,6 @@ static bool update_time()
 
 static void fetch_weather()
 {
-  // Begin dictionary
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
 
@@ -116,7 +113,7 @@ static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
   {
     return;
   }
-  
+
   ++stockCounter;
   ++ weatherCounter;
 
