@@ -49,6 +49,12 @@
                 "type": "font"
             },
             {
+                "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeuib_12.ttf",
+                "name": "SEGOE_BOLD_12",
+                "type": "font"
+            },
+            {
                 "characterRegex": "[0-9:. APM]",
                 "file": "fonts/DS-DIGIB.TTF",
                 "name": "FONT_LCD_43",
