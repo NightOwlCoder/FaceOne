@@ -19,8 +19,9 @@
     "resources": {
         "media": [
             {
+                "characterRegex": "[0-9:. APM]",
                 "file": "fonts/DS-DIGIB.TTF",
-                "name": "FONT_LCD_40",
+                "name": "FONT_LCD_43",
                 "type": "font"
             }
         ]
