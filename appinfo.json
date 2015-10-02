@@ -20,25 +20,25 @@
         "media": [
             {
                 "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeui.ttf",
+                "file": "fonts/segoeui_10.ttf",
                 "name": "SEGOE_10",
                 "type": "font"
             },
             {
                 "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeui.ttf",
+                "file": "fonts/segoeui_12.ttf",
                 "name": "SEGOE_12",
                 "type": "font"
             },
             {
                 "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeui.ttf",
+                "file": "fonts/segoeui_14.ttf",
                 "name": "SEGOE_14",
                 "type": "font"
             },
             {
                 "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeui.ttf",
+                "file": "fonts/segoeui_18.ttf",
                 "name": "SEGOE_18",
                 "type": "font"
             },
