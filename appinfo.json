@@ -44,6 +44,12 @@
             },
             {
                 "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeui_16.ttf",
+                "name": "SEGOE_16",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[ -~\u00b0]",
                 "file": "fonts/ABeeZee-Regular.otf",
                 "name": "STOCK_20",
                 "type": "font"
