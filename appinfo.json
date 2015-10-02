@@ -1,14 +1,14 @@
 {
     "appKeys": {
-        "GetQuote": 8,
-        "KEY_CHANGE": 6,
-        "KEY_CITY": 2,
+        "KEY_TEMPERATURE": 0,
         "KEY_CONDITIONS": 1,
-        "KEY_PRICE": 5,
+        "KEY_CITY": 2,
         "KEY_STOCK_INDEX": 3,
         "KEY_SYMBOL": 4,
-        "KEY_TEMPERATURE": 0,
-        "RefreshWeather": 7
+        "KEY_PRICE": 5,
+        "KEY_CHANGE": 6,
+        "RefreshWeather": 7,
+        "GetQuote": 8
     },
     "capabilities": [
         "location"
@@ -18,6 +18,24 @@
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeui.ttf",
+                "name": "SEGOE_10",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeui.ttf",
+                "name": "SEGOE_12",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeui.ttf",
+                "name": "SEGOE_14",
+                "type": "font"
+            },
             {
                 "characterRegex": "[ -~\u00b0]",
                 "file": "fonts/segoeui.ttf",
