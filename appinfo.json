@@ -1,12 +1,14 @@
 {
     "appKeys": {
-        "GetQuote": 6,
+        "GetQuote": 8,
+        "KEY_CHANGE": 6,
         "KEY_CITY": 2,
         "KEY_CONDITIONS": 1,
-        "KEY_PRICE": 4,
-        "KEY_SYMBOL": 3,
+        "KEY_PRICE": 5,
+        "KEY_STOCK_INDEX": 3,
+        "KEY_SYMBOL": 4,
         "KEY_TEMPERATURE": 0,
-        "RefreshWeather": 5
+        "RefreshWeather": 7
     },
     "capabilities": [
         "location"
@@ -29,7 +31,7 @@
         "aplite",
         "basalt"
     ],
-    "uuid": "3609e2fa-ebba-49d2-8d0b-22a2d7b7b194",
+    "uuid": "93f8fa11-7bac-4714-ae17-86fbf1a5e791",
     "versionLabel": "1.0",
     "watchapp": {
         "watchface": true

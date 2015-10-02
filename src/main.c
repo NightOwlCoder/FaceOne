@@ -1,24 +1,20 @@
 #include <pebble.h>
-#include "window.h"
-  
-//static Window *s_main_window;
-//static TextLayer *s_time_layer;
-//static TextLayer *s_weather_layer;
-//static TextLayer *s_weather_city_layer;
-//static TextLayer *s_symbol_layer;
-//static TextLayer *s_symbol_price_layer;
-//static GFont s_time_font;
+  #include "window.h"
+
+  static int _nextStock;
 
 enum {
   KEY_TEMPERATURE = 0,
   KEY_CONDITIONS = 1,
   KEY_CITY = 2,
   // STOCKS
-  KEY_SYMBOL = 3,
-  KEY_PRICE = 4,
+  KEY_STOCK_INDEX = 3,
+  KEY_SYMBOL = 4,
+  KEY_PRICE = 5,
+  KEY_CHANGE = 6,
   // MSGS
-  RefreshWeather = 5,
-  GetQuote = 6
+  RefreshWeather = 7,
+  GetQuote = 8
 };
 
 static void update_time() {
@@ -35,7 +31,28 @@ static void update_time() {
   else
     strftime(buffer, sizeof("00:00"), "%I:%M", tick_time);
 
-  text_layer_set_text(s_time_layer, buffer);
+  set_time(buffer);
+
+  static char date_weekday[] = "XXX";
+
+  strftime(date_weekday, sizeof(date_weekday), "%a",  tick_time);
+  set_weekday(date_weekday);
+  
+  static char date_date[] = "XX/XX";  
+  static char date_day[] = "XX";  
+  static char date_month[] = "XX";
+  
+  strftime(date_day, sizeof(date_day), "%d",  tick_time);
+  if (date_day[0] == '0')
+ 			memmove(&date_day[0], &date_day[1], sizeof(date_day) - 1);
+
+  strftime(date_month, sizeof(date_month), "%m",  tick_time);
+  if (date_month[0] == '0')
+ 			memmove(&date_month[0], &date_month[1], sizeof(date_month) - 1);
+  
+  snprintf(date_date, sizeof(date_date), "%s/%s", date_month, date_day);
+
+  set_day(date_date);
 }
 
 static void fetch_weather()
@@ -52,85 +69,45 @@ static void fetch_weather()
   app_message_outbox_send();
 }
 
-static void fetch_quote()
+static bool fetch_quote(bool retry)
 {
+  if (!retry)
+  {
+    _nextStock++;
+    if (_nextStock > 3)
+    { 
+      return false;
+    }
+  }
+
   // Begin dictionary
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
 
-  Tuplet cmd = TupletCString(GetQuote, "DIS");
+  Tuplet cmd = TupletInteger(GetQuote, _nextStock);
   dict_write_tuplet(iter, &cmd); 
   dict_write_end(iter); 
 
   // Send the message!
   app_message_outbox_send();
-}
 
-//static void main_window_load(Window *window) {
-//
-//  //Create GFont
-//  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_LCD_40));
-//
-//  // Create time TextLayer
-//  s_time_layer = text_layer_create(GRect(4, 0, 140, 50));
-//  text_layer_set_background_color(s_time_layer, GColorClear);
-//  text_layer_set_text_color(s_time_layer, GColorBlack);
-//  text_layer_set_font(s_time_layer, s_time_font);
-//
-//  // Create symbol TextLayer
-//  s_symbol_layer = text_layer_create(GRect(4, 45, 140, 50));
-//  text_layer_set_background_color(s_symbol_layer, GColorClear);
-//  text_layer_set_text_color(s_symbol_layer, GColorBlack);
-//  text_layer_set_font(s_symbol_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-//
-//  // Create Weather Layer
-//  s_weather_layer = text_layer_create(GRect(0, 127, 140, 35));
-//  text_layer_set_background_color(s_weather_layer, GColorClear);
-//  text_layer_set_text_color(s_weather_layer, GColorBlack);
-//  text_layer_set_text_alignment(s_weather_layer, GTextAlignmentRight);
-//  text_layer_set_font(s_weather_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-//  text_layer_set_text(s_weather_layer, "guessing...");
-//
-//  // Create Weather City Layer
-//  s_weather_city_layer = text_layer_create(GRect(0, 147, 140, 35));
-//  text_layer_set_background_color(  s_weather_city_layer, GColorClear);
-//  text_layer_set_text_color(  s_weather_city_layer, GColorBlack);
-//  text_layer_set_text_alignment(  s_weather_city_layer, GTextAlignmentRight);
-//  text_layer_set_font(s_weather_city_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
-//
-//  // Add to child layer
-//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
-//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_symbol_layer));
-//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_layer));
-//  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_city_layer));
-//
-//  update_time();
-//  fetch_weather();
-//  fetch_quote();
-//}
-//
-//static void main_window_unload(Window *window) {
-//  //Unload GFont
-//  fonts_unload_custom_font(s_time_font);
-//
-//  // Destroy TextLayer
-//  text_layer_destroy(s_time_layer);
-//  text_layer_destroy(s_symbol_layer);
-//  text_layer_destroy(s_weather_layer);
-//  text_layer_destroy(s_weather_city_layer);
-//}
+  return true;
+}
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 {
   update_time();
 
   // Get stock updates every 5 minutes
-  if (tick_time->tm_min % 5 == 0)
-    fetch_quote();
+  if (tick_time->tm_min % 1 == 0)
+  {
+    _nextStock = 0;
+    fetch_quote(false);
+  }
 
   // Get weather update every 15 minutes
   if (tick_time->tm_min % 15 == 0)
-    fetch_weather();  
+    fetch_weather(); 
 }
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
@@ -139,7 +116,9 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   static char weather_layer_buffer[99];
   static char symbol_buffer[99];
   static char price_buffer[99];
+  static char change_buffer[99];
   static char stock_layer_buffer[99];
+  int index = 1;
 
   APP_LOG(APP_LOG_LEVEL_ERROR, "----got msg------");
   // Read first item
@@ -168,7 +147,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
       case KEY_CITY:
       APP_LOG(APP_LOG_LEVEL_ERROR, "setting city with %s, %d", t->value->cstring, strlen(t->value->cstring));
-      text_layer_set_text(s_weather_city_layer, t->value->cstring);    
+      set_city(t->value->cstring);
+      break;
+
+      case KEY_STOCK_INDEX:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "setting index stock to %d", (int)t->value->int32);
+      index = t->value->int32;
       break;
 
       case KEY_SYMBOL:
@@ -179,6 +163,11 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       case KEY_PRICE:
       APP_LOG(APP_LOG_LEVEL_ERROR, "setting price with %s, %d", t->value->cstring, strlen(t->value->cstring));
       snprintf(price_buffer, sizeof(price_buffer), "%s", t->value->cstring);
+      break;
+
+      case KEY_CHANGE:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "setting change with %s, %d", t->value->cstring, strlen(t->value->cstring));
+      snprintf(change_buffer, sizeof(change_buffer), "%s", t->value->cstring);
       break;
 
       default:
@@ -192,17 +181,20 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
   if (*temperature_buffer && *conditions_buffer)
   {
-    snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
+    snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s %s", temperature_buffer, conditions_buffer);
     APP_LOG(APP_LOG_LEVEL_ERROR, "setting weather with [%s]", weather_layer_buffer);
-    text_layer_set_text(s_weather_layer, weather_layer_buffer);  
+    set_weather(weather_layer_buffer);  
   }
 
   if (*symbol_buffer && *price_buffer)
   {
-    snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s: %s (0)", symbol_buffer, price_buffer);
+    snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s: %s", symbol_buffer, price_buffer);
     APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock to [%s]", stock_layer_buffer);
-    text_layer_set_text(s_symbol_layer, stock_layer_buffer);  
+    set_stock(index, stock_layer_buffer);
   }
+
+  if (_nextStock <= 3)
+    fetch_quote(false);
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
@@ -211,13 +203,17 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed! Reason: %d", reason);
+  if (_nextStock <= 3)
+    fetch_quote(true);
 }
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
 }
 
-static void init() {
+static void init()
+{  
+  _nextStock = 0;
   // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
 
@@ -231,28 +227,15 @@ static void init() {
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
 
   show_window();
-
-  //// Create main Window element and assign to pointer
-  //s_main_window = window_create();
-
-  //// Set handlers to manage the elements inside the Window
-  //window_set_window_handlers(s_main_window, (WindowHandlers) {
-  //  .load = main_window_load,
-  //  .unload = main_window_unload
-  //});
-
-  //// Show the Window on the watch, with animated=true
-  //window_stack_push(s_main_window, true);  
 }
 
-static void deinit() {
-  // Destroy Window
-//  window_destroy(s_main_window);
-    hide_window();
-
+static void deinit()
+{
+  hide_window();
 }
 
-int main(void) {
+int main(void)
+{
   init();
   app_event_loop();
   deinit();

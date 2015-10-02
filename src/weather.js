@@ -1,9 +1,11 @@
 var _temperature = "N/A";
 var _conditions = "N/A";
 var _city = "locating...";
+var _index = 1;
 var _symbol = "DIS";
 var _price = "retrieving...";
 var _change = "0";
+var _symbols = ["DIS", "JPM", "FIT"];
 
 var xhrRequest = function (url, type, callback) {
   var xhr = new XMLHttpRequest();
@@ -21,8 +23,10 @@ function SendMessage(method)
       'KEY_TEMPERATURE': _temperature,
       'KEY_CONDITIONS': _conditions,
       'KEY_CITY': _city,
+      'KEY_STOCK_INDEX': _index,
       'KEY_SYMBOL': _symbol,
-      'KEY_PRICE': _price
+      'KEY_PRICE': _price,
+      'KEY_CHANGE': _change
     },
     function(e) { console.log(method + ' sent to Pebble successfully!'); },
     function(e) { console.log(method + ' error sending to Pebble!'); }
@@ -66,13 +70,8 @@ function getWeather() {
 
 function getQuotes()
 {
-  var symbol = localStorage.getItem("symbol");
-
-  if (!symbol)
-    symbol = "DIS";
-
-  console.log('FETCH ' + symbol);
-  FetchQuote(symbol);
+  console.log('FETCH ' + _symbol);
+  FetchQuote(_symbol);
 }
 
 // Listen for when the watchface is opened
@@ -99,7 +98,8 @@ Pebble.addEventListener('appmessage',
                           if (e.payload.GetQuote)
                           {
                             console.log('appmessage: fetching stock ' + e.payload.GetQuote);
-                            _symbol = e.payload.GetQuote;
+                            _index = e.payload.GetQuote;
+                            _symbol = _symbols[_index-1];
                             getQuotes();
                           }                          
                         }
@@ -111,7 +111,6 @@ Pebble.addEventListener('appmessage',
 
 function FetchQuote(symbol)
 {
-  _symbol = symbol;
   var url = "http://dev.markitondemand.com/Api/Quote/json?symbol=" + symbol;
 
   xhrRequest(url, 'GET', 
@@ -119,6 +118,7 @@ function FetchQuote(symbol)
              {
                console.log(responseText);
 
+               _symbol = symbol;
                var response = JSON.parse(responseText);
                if (response.Message)
                {
