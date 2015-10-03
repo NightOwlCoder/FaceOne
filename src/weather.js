@@ -1,11 +1,11 @@
 var _temperature = "N/A";
 var _conditions = "N/A";
-var _city = "locating...";
-var _index = 1;
-var _symbol = "DIS";
-var _price = "retrieving...";
+var _city = "";
+var _index = 0;
+var _symbol = "";
+var _price = "0";
 var _change = "0";
-var _symbols = ["DIS", "JPM", "FIT"];
+var _symbols = ["DIS", "SKX", "SBUX", "FIT"];
 
 var xhrRequest = function (url, type, callback) {
   var xhr = new XMLHttpRequest();
@@ -68,19 +68,12 @@ function getWeather() {
   );
 }
 
-function getQuotes()
-{
-  console.log('FETCH ' + _symbol);
-  FetchQuote(_symbol);
-}
-
 // Listen for when the watchface is opened
 Pebble.addEventListener('ready', 
                         function(e) {
                           console.log('ready: ' + JSON.stringify(e.payload));
 
                           getWeather();
-                          getQuotes();
                         }
                        );
 
@@ -99,8 +92,8 @@ Pebble.addEventListener('appmessage',
                           {
                             console.log('appmessage: fetching stock ' + e.payload.GetQuote);
                             _index = e.payload.GetQuote;
-                            _symbol = _symbols[_index-1];
-                            getQuotes();
+                            _symbol = _symbols[_index - 1];
+                            FetchQuote(_symbol);
                           }                          
                         }
                        );

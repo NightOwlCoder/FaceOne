@@ -4,8 +4,9 @@
   // BEGIN AUTO-GENERATED UI CODE; DO NOT MODIFY
 static Window *s_window;
 static GFont s_res_bitham_42_medium_numbers;
-static GFont s_res_gothic_18;
 static GFont s_res_segoe_16;
+static GFont s_res_gothic_18;
+static GFont s_res_segoe_14;
 static GFont s_res_roboto_condensed_21;
 static GFont s_res_segoe_12;
 static TextLayer *s_textlayer_time;
@@ -18,6 +19,7 @@ static TextLayer *s_textlayer_day;
 static TextLayer *s_textlayer_stock3;
 static TextLayer *s_textlayer_market;
 static TextLayer *s_textlayer_line;
+static TextLayer *s_textlayer_stock4;
 
 static void initialise_ui(void) {
   s_window = window_create();
@@ -27,8 +29,9 @@ static void initialise_ui(void) {
   #endif
   
   s_res_bitham_42_medium_numbers = fonts_get_system_font(FONT_KEY_BITHAM_42_MEDIUM_NUMBERS);
-  s_res_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
   s_res_segoe_16 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SEGOE_16));
+  s_res_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
+  s_res_segoe_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SEGOE_14));
   s_res_roboto_condensed_21 = fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21);
   s_res_segoe_12 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SEGOE_12));
   // s_textlayer_time
@@ -40,11 +43,10 @@ static void initialise_ui(void) {
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_time);
   
   // s_textlayer_stock1
-  s_textlayer_stock1 = text_layer_create(GRect(2, 42, 142, 20));
+  s_textlayer_stock1 = text_layer_create(GRect(2, 46, 142, 20));
   text_layer_set_background_color(s_textlayer_stock1, GColorClear);
   text_layer_set_text_color(s_textlayer_stock1, GColorWhite);
   text_layer_set_text(s_textlayer_stock1, "DIS: 102.67 (+0.27)");
-  text_layer_set_text_alignment(s_textlayer_stock1, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_stock1, s_res_segoe_16);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock1);
   
@@ -58,7 +60,7 @@ static void initialise_ui(void) {
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_weekday);
   
   // s_textlayer_weather
-  s_textlayer_weather = text_layer_create(GRect(44, 140, 100, 16));
+  s_textlayer_weather = text_layer_create(GRect(42, 150, 100, 18));
   text_layer_set_background_color(s_textlayer_weather, GColorClear);
   text_layer_set_text_color(s_textlayer_weather, GColorWhite);
   text_layer_set_text(s_textlayer_weather, "81o, Clouds");
@@ -67,20 +69,19 @@ static void initialise_ui(void) {
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_weather);
   
   // s_textlayer_city
-  s_textlayer_city = text_layer_create(GRect(44, 156, 100, 12));
+  s_textlayer_city = text_layer_create(GRect(22, 134, 120, 16));
   text_layer_set_background_color(s_textlayer_city, GColorClear);
   text_layer_set_text_color(s_textlayer_city, GColorWhite);
   text_layer_set_text(s_textlayer_city, "Stevenson Ranch");
   text_layer_set_text_alignment(s_textlayer_city, GTextAlignmentRight);
-  text_layer_set_font(s_textlayer_city, s_res_segoe_12);
+  text_layer_set_font(s_textlayer_city, s_res_segoe_14);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_city);
   
   // s_textlayer_stock2
-  s_textlayer_stock2 = text_layer_create(GRect(1, 63, 142, 21));
+  s_textlayer_stock2 = text_layer_create(GRect(2, 67, 142, 20));
   text_layer_set_background_color(s_textlayer_stock2, GColorClear);
   text_layer_set_text_color(s_textlayer_stock2, GColorWhite);
   text_layer_set_text(s_textlayer_stock2, "JPM: 59.99");
-  text_layer_set_text_alignment(s_textlayer_stock2, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_stock2, s_res_segoe_16);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock2);
   
@@ -94,11 +95,10 @@ static void initialise_ui(void) {
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_day);
   
   // s_textlayer_stock3
-  s_textlayer_stock3 = text_layer_create(GRect(2, 84, 142, 21));
+  s_textlayer_stock3 = text_layer_create(GRect(2, 88, 142, 20));
   text_layer_set_background_color(s_textlayer_stock3, GColorClear);
   text_layer_set_text_color(s_textlayer_stock3, GColorWhite);
   text_layer_set_text(s_textlayer_stock3, "FIT:38.68");
-  text_layer_set_text_alignment(s_textlayer_stock3, GTextAlignmentCenter);
   text_layer_set_font(s_textlayer_stock3, s_res_segoe_16);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock3);
   
@@ -110,9 +110,17 @@ static void initialise_ui(void) {
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_market);
   
   // s_textlayer_line
-  s_textlayer_line = text_layer_create(GRect(0, 40, 144, 1));
+  s_textlayer_line = text_layer_create(GRect(0, 41, 144, 2));
   text_layer_set_text(s_textlayer_line, "Text layer");
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_line);
+  
+  // s_textlayer_stock4
+  s_textlayer_stock4 = text_layer_create(GRect(2, 109, 142, 20));
+  text_layer_set_background_color(s_textlayer_stock4, GColorClear);
+  text_layer_set_text_color(s_textlayer_stock4, GColorWhite);
+  text_layer_set_text(s_textlayer_stock4, "MDLZ 37.14 (-2.45)");
+  text_layer_set_font(s_textlayer_stock4, s_res_segoe_16);
+  layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock4);
 }
 
 static void destroy_ui(void) {
@@ -127,7 +135,9 @@ static void destroy_ui(void) {
   text_layer_destroy(s_textlayer_stock3);
   text_layer_destroy(s_textlayer_market);
   text_layer_destroy(s_textlayer_line);
+  text_layer_destroy(s_textlayer_stock4);
   fonts_unload_custom_font(s_res_segoe_16);
+  fonts_unload_custom_font(s_res_segoe_14);
   fonts_unload_custom_font(s_res_segoe_12);
 }
 // END AUTO-GENERATED UI CODE
@@ -225,9 +235,7 @@ void set_marketOpen(bool open, char * timetoclose)
   }
 }
 
-static char* stock1_buffer = NULL;
-static char* stock2_buffer = NULL;
-static char* stock3_buffer = NULL;
+static char* stock_buffer[4];
 
 void alocate_and_tranfer(TextLayer *text_layer, char* buffer, char* source_buffer)
 {
@@ -247,13 +255,16 @@ void set_stock(int index, char * value)
   switch (index)
   {
     case 1:
-    alocate_and_tranfer(s_textlayer_stock1, stock1_buffer, value);
+    alocate_and_tranfer(s_textlayer_stock1, stock_buffer[index-1], value);
     break;    
     case 2:
-    alocate_and_tranfer(s_textlayer_stock2, stock2_buffer, value);
+    alocate_and_tranfer(s_textlayer_stock2, stock_buffer[index-1], value);
     break;    
     case 3:
-    alocate_and_tranfer(s_textlayer_stock3, stock3_buffer, value);
+    alocate_and_tranfer(s_textlayer_stock3, stock_buffer[index-1], value);
+    break;
+    case 4:
+    alocate_and_tranfer(s_textlayer_stock4, stock_buffer[index-1], value);
     break;
   }
 }

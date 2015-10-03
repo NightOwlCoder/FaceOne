@@ -1,7 +1,8 @@
 #include <pebble.h>
   #include "window.h"
 
-  static int _nextStock;
+  static int StockCount = 4;
+static int _nextStock;
 
 enum
 {
@@ -24,6 +25,10 @@ static bool update_time(char *timetoclose, int countb)
   // Get a tm structure
   time_t temp = time(NULL); 
   struct tm *tick_time = localtime(&temp);
+  struct tm *tick_time_utc  = gmtime(&temp);
+
+
+  APP_LOG(APP_LOG_LEVEL_ERROR, "hora %d corrigida %d utc %d", tick_time_utc->tm_hour, tick_time->tm_hour, (int)clock_is_timezone_set());
 
   // Create a long-lived buffer
   static char buffer[] = "00:00";
@@ -56,27 +61,25 @@ static bool update_time(char *timetoclose, int countb)
   set_day(date_date);
 
   bool open = false;
-  
-  if (tick_time->tm_hour == 6 && tick_time->tm_min > 28)
-    open = true;  
-  else if (tick_time->tm_hour > 6 && tick_time->tm_hour < 13)
+
+  if (tick_time->tm_hour == 6 && tick_time->tm_min >= 30)
     open = true;
-  else if (tick_time->tm_hour == 23 && tick_time->tm_min <= 5)
+  else if (tick_time->tm_hour > 6 && tick_time->tm_hour < 13)
     open = true;
 
   if (open)
   {
-    int closeAt = 13 * 60;
+    int closeAt = (13 * 60);
     int current = (tick_time->tm_hour * 60) + tick_time->tm_min;
     int timeToClose = closeAt - current;
     int h = timeToClose / 60;
     int m = timeToClose - (h * 60);
-  
+
     snprintf(timetoclose, countb, "-%d:%02d", h, m);
-    
+
     return open;
   }
-  
+
   return false;
 }
 
@@ -98,7 +101,7 @@ static bool fetch_quote(bool retry)
   if (!retry)
   {
     _nextStock++;
-    if (_nextStock > 3)
+    if (_nextStock > StockCount)
     { 
       return false;
     }
@@ -125,8 +128,8 @@ static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
   static char timeToClose[30];
 
   bool marketOpen = update_time(timeToClose, sizeof(timeToClose));
-  
-        APP_LOG(APP_LOG_LEVEL_ERROR, "setting mkt open to %d, %s", (int)marketOpen, timeToClose);
+
+  APP_LOG(APP_LOG_LEVEL_ERROR, "setting mkt open to %d, %s", (int)marketOpen, timeToClose);
 
   set_marketOpen(marketOpen, timeToClose);
 
@@ -229,17 +232,24 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   {
     snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s %s", temperature_buffer, conditions_buffer);
     APP_LOG(APP_LOG_LEVEL_ERROR, "setting weather with [%s]", weather_layer_buffer);
-    set_weather(weather_layer_buffer);  
+    set_weather(weather_layer_buffer);
   }
 
-  if (*symbol_buffer && *price_buffer)
+  if (index > 0 && *symbol_buffer)
   {
-    snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s %s (%s)", symbol_buffer, price_buffer, change_buffer);
-    APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock to [%s]", stock_layer_buffer);
+    if (*price_buffer && *change_buffer)
+    {
+      snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s %s (%s)", symbol_buffer, price_buffer, change_buffer);
+      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock to [%s]", stock_layer_buffer);
+    }
+    else
+    {
+      snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s...", symbol_buffer);
+    }
     set_stock(index, stock_layer_buffer);
   }
 
-  if (_nextStock <= 3)
+  if (_nextStock <= StockCount)
     fetch_quote(false);
 }
 
@@ -249,7 +259,7 @@ static void inbox_dropped_callback(AppMessageResult reason, void *context) {
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed! Reason: %d", reason);
-  if (_nextStock <= 3)
+  if (_nextStock <= StockCount)
     fetch_quote(true);
 }
 
@@ -261,9 +271,6 @@ static void init()
 {  
   _nextStock = 0;
 
-  // Register with TickTimerService
-  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler_minutes);
-
   // Register callbacks
   app_message_register_inbox_received(inbox_received_callback);
   app_message_register_inbox_dropped(inbox_dropped_callback);
@@ -274,6 +281,20 @@ static void init()
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
 
   show_window();
+
+  // Register with TickTimerService
+  tick_timer_service_subscribe(MINUTE_UNIT, tick_handler_minutes);
+
+
+  // Call handler once to populate initial time display
+  time_t current_time = time(NULL);
+  tick_handler_minutes(localtime(&current_time), SECOND_UNIT | MINUTE_UNIT);
+  set_stock(1, "DIS...");
+  set_stock(2, "SKX...");
+  set_stock(3, "SBUX...");
+  set_stock(4, "FIT...");
+  set_weather("waiting...");
+  set_city("locating...");
 }
 
 static void deinit()

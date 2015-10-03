@@ -20,6 +20,30 @@
         "media": [
             {
                 "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeuib_12.ttf",
+                "name": "SEGOE_BOLD_12",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/ABeeZee-Regular.otf",
+                "name": "STOCK_20",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeui_10.ttf",
+                "name": "SEGOE_10",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[ -~\u00b0]",
+                "file": "fonts/segoeui_12.ttf",
+                "name": "SEGOE_12",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[ -~\u00b0]",
                 "file": "fonts/segoeui_16.ttf",
                 "name": "SEGOE_16",
                 "type": "font"
@@ -31,30 +55,6 @@
                 "type": "font"
             },
             {
-                "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/ABeeZee-Regular.otf",
-                "name": "STOCK_20",
-                "type": "font"
-            },
-            {
-                "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeui_14.ttf",
-                "name": "SEGOE_14",
-                "type": "font"
-            },
-            {
-                "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeui_10.ttf",
-                "name": "SEGOE_10",
-                "type": "font"
-            },
-            {
-                "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeuib_12.ttf",
-                "name": "SEGOE_BOLD_12",
-                "type": "font"
-            },
-            {
                 "characterRegex": "[0-9:. APM]",
                 "file": "fonts/DS-DIGIB.TTF",
                 "name": "FONT_LCD_43",
@@ -62,8 +62,8 @@
             },
             {
                 "characterRegex": "[ -~\u00b0]",
-                "file": "fonts/segoeui_12.ttf",
-                "name": "SEGOE_12",
+                "file": "fonts/segoeui_14.ttf",
+                "name": "SEGOE_14",
                 "type": "font"
             }
         ]
