@@ -7,7 +7,6 @@ static GFont s_res_bitham_42_medium_numbers;
 static GFont s_res_segoe_16;
 static GFont s_res_gothic_18;
 static GFont s_res_segoe_14;
-static GFont s_res_roboto_condensed_21;
 static GFont s_res_segoe_12;
 static TextLayer *s_textlayer_time;
 static TextLayer *s_textlayer_stock1;
@@ -15,7 +14,6 @@ static TextLayer *s_textlayer_weekday;
 static TextLayer *s_textlayer_weather;
 static TextLayer *s_textlayer_city;
 static TextLayer *s_textlayer_stock2;
-static TextLayer *s_textlayer_day;
 static TextLayer *s_textlayer_stock3;
 static TextLayer *s_textlayer_market;
 static TextLayer *s_textlayer_line;
@@ -32,7 +30,6 @@ static void initialise_ui(void) {
   s_res_segoe_16 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SEGOE_16));
   s_res_gothic_18 = fonts_get_system_font(FONT_KEY_GOTHIC_18);
   s_res_segoe_14 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SEGOE_14));
-  s_res_roboto_condensed_21 = fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21);
   s_res_segoe_12 = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_SEGOE_12));
   // s_textlayer_time
   s_textlayer_time = text_layer_create(GRect(0, -5, 104, 43));
@@ -85,15 +82,6 @@ static void initialise_ui(void) {
   text_layer_set_font(s_textlayer_stock2, s_res_segoe_16);
   layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_stock2);
   
-  // s_textlayer_day
-  s_textlayer_day = text_layer_create(GRect(99, 0, 44, 21));
-  text_layer_set_background_color(s_textlayer_day, GColorClear);
-  text_layer_set_text_color(s_textlayer_day, GColorWhite);
-  text_layer_set_text(s_textlayer_day, "0/00");
-  text_layer_set_text_alignment(s_textlayer_day, GTextAlignmentRight);
-  text_layer_set_font(s_textlayer_day, s_res_roboto_condensed_21);
-  layer_add_child(window_get_root_layer(s_window), (Layer *)s_textlayer_day);
-  
   // s_textlayer_stock3
   s_textlayer_stock3 = text_layer_create(GRect(2, 88, 142, 20));
   text_layer_set_background_color(s_textlayer_stock3, GColorClear);
@@ -131,7 +119,6 @@ static void destroy_ui(void) {
   text_layer_destroy(s_textlayer_weather);
   text_layer_destroy(s_textlayer_city);
   text_layer_destroy(s_textlayer_stock2);
-  text_layer_destroy(s_textlayer_day);
   text_layer_destroy(s_textlayer_stock3);
   text_layer_destroy(s_textlayer_market);
   text_layer_destroy(s_textlayer_line);

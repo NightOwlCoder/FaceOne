@@ -1,12 +1,12 @@
 {
     "appKeys": {
-        "GetQuote": 8,
-        "KEY_CHANGE": 6,
+        "GetQuotes": 8,
         "KEY_CITY": 2,
         "KEY_CONDITIONS": 1,
-        "KEY_PRICE": 5,
-        "KEY_STOCK_INDEX": 3,
-        "KEY_SYMBOL": 4,
+        "KEY_STOCK_1": 3,
+        "KEY_STOCK_2": 4,
+        "KEY_STOCK_3": 5,
+        "KEY_STOCK_4": 6,
         "KEY_TEMPERATURE": 0,
         "RefreshWeather": 7
     },
@@ -68,13 +68,10 @@
             }
         ]
     },
-    "sdkVersion": "3",
+    "sdkVersion": "2",
     "shortName": "FaceOne",
-    "targetPlatforms": [
-        "aplite",
-        "basalt"
-    ],
-    "uuid": "93f8fa11-7bac-4714-ae17-86fbf1a5e791",
+    "uuid": "65530115-9ea3-4a8c-b958-4067eca1d86f",
+    "versionCode": 1,
     "versionLabel": "1.0",
     "watchapp": {
         "watchface": true

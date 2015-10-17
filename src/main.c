@@ -1,7 +1,7 @@
 #include <pebble.h>
-  #include "window.h"
+#include "window.h"
 
-  static int StockCount = 4;
+static int StockCount = 4;
 static int _nextStock;
 
 enum
@@ -10,13 +10,13 @@ enum
   KEY_CONDITIONS = 1,
   KEY_CITY = 2,
   // STOCKS
-  KEY_STOCK_INDEX = 3,
-  KEY_SYMBOL = 4,
-  KEY_PRICE = 5,
-  KEY_CHANGE = 6,
+  KEY_STOCK_1 = 3,
+  KEY_STOCK_2 = 4,
+  KEY_STOCK_3 = 5,
+  KEY_STOCK_4 = 6,
   // MSGS
   RefreshWeather = 7,
-  GetQuote = 8
+  GetQuotes = 8
 };
 
 // returns true when market is open
@@ -52,7 +52,7 @@ static bool update_time(char *timetoclose, int countb)
   if (date_day[0] == '0')
     memmove(&date_day[0], &date_day[1], sizeof(date_day) - 1);
 
-  strftime(date_month, sizeof(date_month), "%m",  tick_time);
+  strftime(date_month, sizeof(date_month), "%m",  tick_time);  
   if (date_month[0] == '0')
     memmove(&date_month[0], &date_month[1], sizeof(date_month) - 1);
 
@@ -67,6 +67,11 @@ static bool update_time(char *timetoclose, int countb)
   else if (tick_time->tm_hour > 6 && tick_time->tm_hour < 13)
     open = true;
 
+    if (tick_time->tm_wday == 0 || tick_time->tm_wday == 6)
+    open = false;
+
+    APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting mkt open to %d, week day = %d", (int)open, tick_time->tm_wday);
+
   if (open)
   {
     int closeAt = (13 * 60);
@@ -76,11 +81,9 @@ static bool update_time(char *timetoclose, int countb)
     int m = timeToClose - (h * 60);
 
     snprintf(timetoclose, countb, "-%d:%02d", h, m);
-
-    return open;
   }
 
-  return false;
+  return open;
 }
 
 static void fetch_weather()
@@ -98,20 +101,11 @@ static void fetch_weather()
 
 static bool fetch_quote(bool retry)
 {
-  if (!retry)
-  {
-    _nextStock++;
-    if (_nextStock > StockCount)
-    { 
-      return false;
-    }
-  }
-
   // Begin dictionary
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
 
-  Tuplet cmd = TupletInteger(GetQuote, _nextStock);
+  Tuplet cmd = TupletInteger(GetQuotes, _nextStock);
   dict_write_tuplet(iter, &cmd); 
   dict_write_end(iter); 
 
@@ -163,10 +157,10 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   static char temperature_buffer[99];
   static char conditions_buffer[99];
   static char weather_layer_buffer[99];
-  static char symbol_buffer[99];
-  static char price_buffer[99];
-  static char change_buffer[99];
-  static char stock_layer_buffer[99];
+  static char stock1_layer_buffer[99];
+  static char stock2_layer_buffer[99];
+  static char stock3_layer_buffer[99];
+  static char stock4_layer_buffer[99];
   int index = 1;
 
   APP_LOG(APP_LOG_LEVEL_ERROR, "----got msg------");
@@ -175,9 +169,10 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
   *temperature_buffer=0;
   *conditions_buffer=0;
-  *symbol_buffer=0;
-  *price_buffer=0;
-
+  *stock1_layer_buffer=0;
+  *stock2_layer_buffer=0;
+  *stock3_layer_buffer=0;
+  *stock4_layer_buffer=0;
 
   while(t != NULL) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d", (int)t->key);
@@ -199,24 +194,24 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       set_city(t->value->cstring);
       break;
 
-      case KEY_STOCK_INDEX:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting index stock to %d", (int)t->value->int32);
-      index = t->value->int32;
+      case KEY_STOCK_1:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 1 to %s", t->value->cstring);
+      snprintf(stock1_layer_buffer, sizeof(stock1_layer_buffer), "%s", t->value->cstring);
       break;
 
-      case KEY_SYMBOL:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting symbol with %s, %d", t->value->cstring, strlen(t->value->cstring));
-      snprintf(symbol_buffer, sizeof(symbol_buffer), "%s", t->value->cstring);
+      case KEY_STOCK_2:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 2 to %s", t->value->cstring);
+      snprintf(stock2_layer_buffer, sizeof(stock2_layer_buffer), "%s", t->value->cstring);
       break;
 
-      case KEY_PRICE:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting price with %s, %d", t->value->cstring, strlen(t->value->cstring));
-      snprintf(price_buffer, sizeof(price_buffer), "%s", t->value->cstring);
+      case KEY_STOCK_3:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 3 to %s", t->value->cstring);
+      snprintf(stock3_layer_buffer, sizeof(stock3_layer_buffer), "%s", t->value->cstring);
       break;
 
-      case KEY_CHANGE:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting change with %s, %d", t->value->cstring, strlen(t->value->cstring));
-      snprintf(change_buffer, sizeof(change_buffer), "%s", t->value->cstring);
+      case KEY_STOCK_4:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 4 to %s", t->value->cstring);
+      snprintf(stock4_layer_buffer, sizeof(stock4_layer_buffer), "%s", t->value->cstring);
       break;
 
       default:
@@ -235,22 +230,10 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     set_weather(weather_layer_buffer);
   }
 
-  if (index > 0 && *symbol_buffer)
-  {
-    if (*price_buffer && *change_buffer)
-    {
-      snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s %s (%s)", symbol_buffer, price_buffer, change_buffer);
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock to [%s]", stock_layer_buffer);
-    }
-    else
-    {
-      snprintf(stock_layer_buffer, sizeof(stock_layer_buffer), "%s...", symbol_buffer);
-    }
-    set_stock(index, stock_layer_buffer);
-  }
-
-  if (_nextStock <= StockCount)
-    fetch_quote(false);
+  if (*stock1_layer_buffer) set_stock(1, stock1_layer_buffer);
+  if (*stock2_layer_buffer)   set_stock(2, stock2_layer_buffer);
+  if (*stock3_layer_buffer) set_stock(3, stock3_layer_buffer);
+  if (*stock4_layer_buffer) set_stock(4, stock4_layer_buffer);
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
