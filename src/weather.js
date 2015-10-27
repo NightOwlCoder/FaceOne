@@ -1,11 +1,10 @@
 var _temperature = "N/A";
 var _conditions = "N/A";
 var _city = "";
-var _stock_1 = "";
-var _stock_2 = "";
-var _stock_3 = "";
-var _stock_4 = "";
-var _symbols_default = "'DIS','SKX','SBUX','PNRA'";
+var _stocks = ["","","",""];
+var _symbols_default = "'DIS','SKX','CRM','PFE'";
+var sendingMessage=false;
+var pendingMethod="";
 
 var xhrRequest = function (url, type, callback) {
   var xhr = new XMLHttpRequest();
@@ -18,19 +17,36 @@ var xhrRequest = function (url, type, callback) {
 
 function SendMessage(method)
 {
+  if (sendingMessage)
+  {
+    console.log ('message send in progress, skipping '+method);
+    pendingMethod=method;
+    return;
+  }
+  sendingMessage=true;
+  console.log('sending '+method);
   Pebble.sendAppMessage(
     {
       'KEY_TEMPERATURE': _temperature,
       'KEY_CONDITIONS': _conditions,
       'KEY_CITY': _city,
-      'KEY_STOCK_1': _stock_1,
-      'KEY_STOCK_2': _stock_2,
-      'KEY_STOCK_3': _stock_3,
-      'KEY_STOCK_4': _stock_4
+      'KEY_STOCK_1': _stocks[0],
+      'KEY_STOCK_2': _stocks[1],
+      'KEY_STOCK_3': _stocks[2],
+      'KEY_STOCK_4': _stocks[3]
     },
-    function(e) { console.log(method + ' sent to Pebble successfully!'); },
-    function(e) { console.log(method + ' error sending to Pebble!'); }
+    function(e) {sendIfPending(method + '['+JSON.stringify(e)+'] sent to Pebble successfully!');},
+    function(e) {sendIfPending(method + ' error ['+JSON.stringify(e)+'] sending to Pebble!');}
   );
+}
+
+function sendIfPending(msg)
+{
+  console.log(msg);
+  sendingMessage=false; 
+  if (pendingMethod) 
+    SendMessage(pendingMethod);
+  pendingMethod="";
 }
 
 function isEmpty(str)
@@ -56,7 +72,7 @@ function locationSuccess(pos)
                if (isEmpty(_city))
                  _city = json.query.results.Result.county;
 
-               getAndSendWeather(json.query.results.Result.woeid)      
+               getAndSendWeather(json.query.results.Result.woeid);    
              }      
             );
 }
@@ -96,13 +112,18 @@ function getWeather() {
 }
 
 // Listen for when the watchface is opened
-Pebble.addEventListener('ready', 
-                        function(e) {
-                          console.log('ready: ' + JSON.stringify(e.payload));
+Pebble.addEventListener('ready', function(e) {
+  getWeather();
+  FetchQuote(_symbols_default);
+});
 
-                          getWeather();
-                        }
-                       );
+Pebble.addEventListener('showConfiguration', function(e) {
+  Pebble.openURL('http://nightowlcoder.github.io/faceone.html');
+});
+
+Pebble.addEventListener('webviewclosed', function(e) {
+  console.log('Configuration window returned: ' + e.response);
+});
 
 // Listen for when an AppMessage is received
 Pebble.addEventListener('appmessage',
@@ -148,42 +169,30 @@ function FetchSymbolsToFetch()
 function FetchQuote(symbols)
 {
   //var url = "http://dev.markitondemand.com/Api/Quote/json?symbol=" + symbol;
-  var query = 'select * from yahoo.finance.quotes where symbol in ('+symbols+')&env=http://datatables.org/alltables.env';
-  var url = "http://query.yahooapis.com/v1/public/yql?q=" + encodeURIComponent(query) + '&format=json';
+  var query = 'select * from yahoo.finance.quotes where symbol in ('+symbols+')';
+  var url = "http://query.yahooapis.com/v1/public/yql?q=" + encodeURIComponent(query) + '&env=http://datatables.org/alltables.env&format=json';
   console.log(query);
   console.log(url);
 
   xhrRequest(url, 'GET', 
              function(responseText)
              {
-               console.log(responseText);
-
                var response = JSON.parse(responseText);
                if (!response.query)
                {
                  SendMessage("price error");
                }
-                                console.log('antes'+_stock_1);
 
-               getStockPrice(_stock_1, response.query.results.quote[0]);
-                                console.log('depois'+_stock_1);
-               getStockPrice(_stock_2, response.query.results.quote[1]);
-               getStockPrice(_stock_3, response.query.results.quote[2]);
-               getStockPrice(_stock_4, response.query.results.quote[3]);
+               setStockPrice(0, response.query.results.quote[0]);
+               setStockPrice(1, response.query.results.quote[1]);
+               setStockPrice(2, response.query.results.quote[2]);
+               setStockPrice(3, response.query.results.quote[3]);
                SendMessage("quote");
-
-               //_price = response.Data.LastPrice.toFixed(2);
-               //_change = response.Data.Change.toFixed(2);
-
              }
             );
 }
 
-function getStockPrice(stock, data)
+function setStockPrice(index, data)
 {
-                 console.log('antes'+stock);
-
-  stock = data.symbol + ' ' + data.LastTradePriceOnly + '(' + data.Change + ')';
-                   console.log('depois'+stock);
-
+  _stocks[index] = data.symbol + ' ' + data.LastTradePriceOnly + '(' + data.Change + ')';
 }

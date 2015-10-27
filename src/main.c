@@ -27,8 +27,7 @@ static bool update_time(char *timetoclose, int countb)
   struct tm *tick_time = localtime(&temp);
   struct tm *tick_time_utc  = gmtime(&temp);
 
-
-  APP_LOG(APP_LOG_LEVEL_ERROR, "hora %d corrigida %d utc %d", tick_time_utc->tm_hour, tick_time->tm_hour, (int)clock_is_timezone_set());
+  APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "hora %d corrigida %d utc %d", tick_time_utc->tm_hour, tick_time->tm_hour, (int)clock_is_timezone_set());
 
   // Create a long-lived buffer
   static char buffer[] = "00:00";
@@ -70,7 +69,7 @@ static bool update_time(char *timetoclose, int countb)
     if (tick_time->tm_wday == 0 || tick_time->tm_wday == 6)
     open = false;
 
-    APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting mkt open to %d, week day = %d", (int)open, tick_time->tm_wday);
+    APP_LOG(APP_LOG_LEVEL_INFO, "setting mkt open to %d, week day = %d", (int)open, tick_time->tm_wday);
 
   if (open)
   {
@@ -109,7 +108,7 @@ static bool fetch_quote(bool retry)
   dict_write_tuplet(iter, &cmd); 
   dict_write_end(iter); 
 
-  // Send the message!
+  // Send the message
   app_message_outbox_send();
 
   return true;
@@ -121,10 +120,15 @@ static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
   static int weatherCounter = 0;
   static char timeToClose[30];
 
+  ++ weatherCounter;
+  // Get weather update every 20 minutes
+  if (weatherCounter >= 20)
+  {
+    weatherCounter = 0;
+    fetch_weather(); 
+  }
+  
   bool marketOpen = update_time(timeToClose, sizeof(timeToClose));
-
-  APP_LOG(APP_LOG_LEVEL_ERROR, "setting mkt open to %d, %s", (int)marketOpen, timeToClose);
-
   set_marketOpen(marketOpen, timeToClose);
 
   if (!marketOpen)
@@ -133,7 +137,6 @@ static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
   }
 
   ++stockCounter;
-  ++ weatherCounter;
 
   // Get stock updates every 10 minutes
   if (stockCounter >= 10)
@@ -142,13 +145,6 @@ static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
     _nextStock = 0;
     fetch_quote(false);
     return;
-  }
-
-  // Get weather update every 15 minutes
-  if (weatherCounter >= 15)
-  {
-    weatherCounter = 0;
-    fetch_weather(); 
   }
 }
 
@@ -163,7 +159,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   static char stock4_layer_buffer[99];
   int index = 1;
 
-  APP_LOG(APP_LOG_LEVEL_ERROR, "----got msg------");
+  APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "----got msg------");
   // Read first item
   Tuple *t = dict_read_first(iterator);
 
@@ -175,47 +171,47 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   *stock4_layer_buffer=0;
 
   while(t != NULL) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d", (int)t->key);
+    APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "Key %d", (int)t->key);
 
     switch(t->key) {
       case KEY_TEMPERATURE:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting temp with %s, %d", t->value->cstring, strlen(t->value->cstring));
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting temp with %s, %d", t->value->cstring, strlen(t->value->cstring));
       snprintf(temperature_buffer, sizeof(temperature_buffer), "%s\u00B0", t->value->cstring);
-      APP_LOG(APP_LOG_LEVEL_ERROR, "temp bufer is %s, %d", temperature_buffer, strlen(temperature_buffer));
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "temp bufer is %s, %d", temperature_buffer, strlen(temperature_buffer));
       break;
 
       case KEY_CONDITIONS:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting conditions with %s, %d", t->value->cstring, strlen(t->value->cstring));
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting conditions with %s, %d", t->value->cstring, strlen(t->value->cstring));
       snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", t->value->cstring);
       break;
 
       case KEY_CITY:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting city with %s, %d", t->value->cstring, strlen(t->value->cstring));
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting city with %s, %d", t->value->cstring, strlen(t->value->cstring));
       set_city(t->value->cstring);
       break;
 
       case KEY_STOCK_1:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 1 to %s", t->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting stock 1 to %s", t->value->cstring);
       snprintf(stock1_layer_buffer, sizeof(stock1_layer_buffer), "%s", t->value->cstring);
       break;
 
       case KEY_STOCK_2:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 2 to %s", t->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting stock 2 to %s", t->value->cstring);
       snprintf(stock2_layer_buffer, sizeof(stock2_layer_buffer), "%s", t->value->cstring);
       break;
 
       case KEY_STOCK_3:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 3 to %s", t->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting stock 3 to %s", t->value->cstring);
       snprintf(stock3_layer_buffer, sizeof(stock3_layer_buffer), "%s", t->value->cstring);
       break;
 
       case KEY_STOCK_4:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "setting stock 4 to %s", t->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting stock 4 to %s", t->value->cstring);
       snprintf(stock4_layer_buffer, sizeof(stock4_layer_buffer), "%s", t->value->cstring);
       break;
 
       default:
-      APP_LOG(APP_LOG_LEVEL_ERROR, "Key %d not recognized!", (int)t->key);
+      APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "Key %d not recognized!", (int)t->key);
       break;
     }
 
@@ -226,12 +222,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   if (*temperature_buffer && *conditions_buffer)
   {
     snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s %s", temperature_buffer, conditions_buffer);
-    APP_LOG(APP_LOG_LEVEL_ERROR, "setting weather with [%s]", weather_layer_buffer);
+    APP_LOG(APP_LOG_LEVEL_DEBUG_VERBOSE, "setting weather with [%s]", weather_layer_buffer);
     set_weather(weather_layer_buffer);
   }
 
   if (*stock1_layer_buffer) set_stock(1, stock1_layer_buffer);
-  if (*stock2_layer_buffer)   set_stock(2, stock2_layer_buffer);
+  if (*stock2_layer_buffer) set_stock(2, stock2_layer_buffer);
   if (*stock3_layer_buffer) set_stock(3, stock3_layer_buffer);
   if (*stock4_layer_buffer) set_stock(4, stock4_layer_buffer);
 }
@@ -268,14 +264,13 @@ static void init()
   // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler_minutes);
 
-
   // Call handler once to populate initial time display
   time_t current_time = time(NULL);
-  tick_handler_minutes(localtime(&current_time), SECOND_UNIT | MINUTE_UNIT);
-  set_stock(1, "DIS...");
-  set_stock(2, "SKX...");
-  set_stock(3, "SBUX...");
-  set_stock(4, "FIT...");
+  tick_handler_minutes(localtime(&current_time), MINUTE_UNIT);
+  set_stock(1, "");
+  set_stock(2, "");
+  set_stock(3, "");
+  set_stock(4, "");
   set_weather("waiting...");
   set_city("locating...");
 }

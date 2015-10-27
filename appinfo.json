@@ -11,13 +11,20 @@
         "RefreshWeather": 7
     },
     "capabilities": [
-        "location"
+        "location",
+        "configurable"
     ],
     "companyName": "NightOwl",
     "longName": "FaceOne",
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "file": "images/f1.png",
+                "menuIcon": true,
+                "name": "MENU_IMAGE",
+                "type": "png"
+            },
             {
                 "characterRegex": "[ -~\u00b0]",
                 "file": "fonts/segoeuib_12.ttf",
