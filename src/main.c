@@ -1,6 +1,8 @@
 #include <pebble.h>
 #include "window.h"
 
+static int stockCounter = 0;
+static int weatherCounter = 0;
 static int StockCount = 4;
 static int _nextStock;
 static char temperature_buffer[10];
@@ -84,8 +86,11 @@ static bool update_time(char *timetoclose, int countb)
 		int h = timeToClose / 60;
 		int m = timeToClose - (h * 60);
 
-		snprintf(timetoclose, countb, "-%d:%02d", h, m);
+		snprintf(timetoclose, countb, "-%d:%02d %d/%d", h, m, 20-weatherCounter, 10-stockCounter);
 	}
+  else
+ 		snprintf(timetoclose, countb, "cl %d/%d", 20-weatherCounter, 10-stockCounter);
+
 
 	return open;
 }
@@ -121,11 +126,12 @@ static bool fetch_quote(bool retry)
 
 static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
 {
-	static int stockCounter = 0;
-	static int weatherCounter = 0;
 	static char timeToClose[30];
 
 	++weatherCounter;
+	if (stockCounter < 10)
+	  ++stockCounter;
+  
 	// Get weather update every 20 minutes
 	if (weatherCounter >= 20)
 	{
@@ -141,8 +147,6 @@ static void tick_handler_minutes(struct tm *tick_time, TimeUnits units_changed)
 	{
 		return;
 	}
-
-	++stockCounter;
 
 	// Get stock updates every 10 minutes
 	if (stockCounter >= 10)

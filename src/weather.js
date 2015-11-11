@@ -2,7 +2,7 @@ var _temperature = "N/A";
 var _conditions = "N/A";
 var _city = "";
 var _stocks = ["","","",""];
-var _symbols_default = "'DIS','SKX','CRM','PFE'";
+var _symbols_default = "'ADT','C','FB','SWN'";
 var sendingMessage=false;
 var pendingMethod="";
 
@@ -194,5 +194,5 @@ function FetchQuote(symbols)
 
 function setStockPrice(index, data)
 {
-  _stocks[index] = data.symbol + ' ' + data.LastTradePriceOnly + '(' + data.Change + ')';
+  _stocks[index] = data.symbol + ' ' + data.LastTradePriceOnly + ' (' + data.Change + ')';
 }
