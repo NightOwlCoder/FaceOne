@@ -2,7 +2,7 @@ var _temperature = "N/A";
 var _conditions = "N/A";
 var _city = "";
 var _stocks = ["","","",""];
-var _symbols_default = "'ADT','C','FB','SWN'";
+var _symbols_default = "'MSFT','AAPL','FB','AMZN'";
 var sendingMessage=false;
 var pendingMethod="";
 
